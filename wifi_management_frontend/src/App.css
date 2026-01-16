@@ -12,6 +12,28 @@
   background: var(--gradient-soft);
 }
 
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 1000;
+
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-weight: 800;
+
+  transform: translateY(-140%);
+  transition: transform 120ms ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
 /* Sidebar */
 .app-sidebar {
   position: sticky;
@@ -163,6 +185,11 @@
   text-decoration: none;
 }
 
+.nav a:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .nav a:active {
   transform: translateY(1px);
 }
@@ -215,6 +242,12 @@
 
 .header-right {
   display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-status {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
 }
@@ -446,6 +479,12 @@
 
 .th-sort-button:hover {
   background: rgba(37, 99, 235, 0.04);
+}
+
+.th-sort-button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 10px;
 }
 
 .sort-indicator {

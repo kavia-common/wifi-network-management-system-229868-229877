@@ -1,4 +1,6 @@
 import React, { useMemo, useState } from "react";
+import { isFeatureEnabled } from "../../utils/featureFlags";
+import { Badge, VisuallyHidden } from "../ui";
 
 /**
  * Placeholder/stubbed status source.
@@ -14,6 +16,7 @@ function getStubbedStatus() {
 function HeaderStatus() {
   /** Header component that displays the current network/system status (stubbed for now). */
   const [status] = useState(() => getStubbedStatus());
+  const useMocks = useMemo(() => isFeatureEnabled("useMocks", false), []);
 
   const dotClassName = useMemo(() => {
     if (status.level === "ok") return "status-dot ok";
@@ -22,11 +25,20 @@ function HeaderStatus() {
   }, [status.level]);
 
   return (
-    <div className="status-pill" aria-label="Network status">
-      <span className={dotClassName} aria-hidden="true" />
-      <span>
-        Status: <strong>{status.label}</strong>
-      </span>
+    <div className="header-status" aria-label="Header status">
+      <div className="status-pill" role="status" aria-label="Network status">
+        <span className={dotClassName} aria-hidden="true" />
+        <span>
+          Status: <strong>{status.label}</strong>
+        </span>
+      </div>
+
+      <div aria-label="Data source mode">
+        <Badge variant={useMocks ? "warn" : "info"} title={useMocks ? "Using deterministic mocks" : "Using real API services"}>
+          {useMocks ? "Mock mode" : "Real API"}
+        </Badge>
+        <VisuallyHidden aria-live="polite">Data source: {useMocks ? "mock mode enabled" : "real API mode enabled"}</VisuallyHidden>
+      </div>
     </div>
   );
 }

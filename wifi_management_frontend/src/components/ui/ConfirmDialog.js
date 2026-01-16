@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import Button from "./Button";
+import { useFocusTrap } from "./a11y";
 
 /**
  * Minimal modal confirm dialog.
  * - Uses a basic overlay + panel.
- * - Focuses the confirm button on open.
+ * - Traps focus while open, returns focus to trigger on close.
  * - Esc closes (onCancel).
+ * - Click outside closes (overlay mousedown).
  */
 
 // PUBLIC_INTERFACE
@@ -20,50 +22,70 @@ function ConfirmDialog({
   onCancel,
 }) {
   /** Modal confirm dialog for destructive actions and confirmations. */
-  const confirmRef = useRef(null);
+  const dialogRef = useRef(null);
+  const titleIdRef = useRef(`confirm-title-${Math.random().toString(36).slice(2)}`);
+  const descIdRef = useRef(`confirm-desc-${Math.random().toString(36).slice(2)}`);
 
   const confirmVariant = useMemo(() => {
     if (tone === "danger") return "secondary"; // amber as caution in this theme
     return "primary";
   }, [tone]);
 
+  const { restoreFocus } = useFocusTrap({
+    enabled: open,
+    containerRef: dialogRef,
+    autoFocus: true,
+  });
+
   useEffect(() => {
-    if (!open) return;
-    const t = window.setTimeout(() => {
-      confirmRef.current?.focus?.();
-    }, 0);
+    if (!open) return undefined;
 
     const onKeyDown = (e) => {
-      if (e.key === "Escape") onCancel?.();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCancel?.();
+      }
     };
 
-    window.addEventListener("keydown", onKeyDown);
+    // Capture so we reliably receive Esc even if focus is on a child control
+    document.addEventListener("keydown", onKeyDown, true);
+
     return () => {
-      window.clearTimeout(t);
-      window.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("keydown", onKeyDown, true);
+      // Ensure focus returns to the triggering control
+      restoreFocus();
     };
-  }, [open, onCancel]);
+  }, [open, onCancel, restoreFocus]);
 
   if (!open) return null;
 
   return (
     <div className="modal-overlay" role="presentation" onMouseDown={onCancel}>
       <div
+        ref={dialogRef}
         className="modal"
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={titleIdRef.current}
+        aria-describedby={description ? descIdRef.current : undefined}
+        tabIndex={-1}
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <div className="modal-title">{title}</div>
+          <div className="modal-title" id={titleIdRef.current}>
+            {title}
+          </div>
         </div>
-        {description ? <div className="modal-body">{description}</div> : null}
+        {description ? (
+          <div className="modal-body" id={descIdRef.current}>
+            {description}
+          </div>
+        ) : null}
         <div className="modal-footer">
-          <Button variant="ghost" onClick={onCancel}>
+          <Button variant="ghost" onClick={onCancel} autoFocus={false}>
             {cancelLabel}
           </Button>
-          <Button ref={confirmRef} variant={confirmVariant} onClick={onConfirm}>
+          <Button variant={confirmVariant} onClick={onConfirm} autoFocus={false}>
             {confirmLabel}
           </Button>
         </div>

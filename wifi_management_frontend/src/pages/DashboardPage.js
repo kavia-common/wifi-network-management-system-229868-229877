@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { clientsService, healthService, networksService } from "../api";
-import { Badge, Button, Card, ErrorBanner, LoadingSkeleton } from "../components/ui";
+import { Badge, Button, Card, ErrorBanner, LoadingSkeleton, getAriaErrorMessage } from "../components/ui";
 
 /**
  * Dashboard view:
@@ -11,8 +11,7 @@ import { Badge, Button, Card, ErrorBanner, LoadingSkeleton } from "../components
  */
 
 function normalizeApiErrorMessage(err) {
-  const msg = err?.api?.message || err?.message;
-  return String(msg || "Unexpected error");
+  return getAriaErrorMessage(err, "Unexpected error");
 }
 
 function coerceStatusLabel(status) {
@@ -365,15 +364,30 @@ function DashboardPage() {
           <div style={{ fontSize: 12, color: "var(--muted)", fontWeight: 900 }}>Quick Actions</div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 12 }}>
-            <Button variant="primary" loading={actionBusy.addNetwork} onClick={onAddNetwork}>
+            <Button
+              variant="primary"
+              loading={actionBusy.addNetwork}
+              onClick={onAddNetwork}
+              aria-label="Add a new network"
+            >
               Add Network
             </Button>
 
-            <Button variant="ghost" loading={actionBusy.rescan} onClick={onRescan}>
+            <Button
+              variant="ghost"
+              loading={actionBusy.rescan}
+              onClick={onRescan}
+              aria-label="Rescan and refresh dashboard data"
+            >
               Rescan / Refresh Data
             </Button>
 
-            <Button variant="secondary" loading={actionBusy.restartAp} onClick={onRestartAp}>
+            <Button
+              variant="secondary"
+              loading={actionBusy.restartAp}
+              onClick={onRestartAp}
+              aria-label="Restart access point (simulated)"
+            >
               Restart AP
             </Button>
           </div>

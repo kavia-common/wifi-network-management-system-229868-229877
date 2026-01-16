@@ -7,3 +7,4 @@ export { default as EmptyState } from "./EmptyState";
 export { default as LoadingSkeleton } from "./LoadingSkeleton";
 export { default as ErrorBanner } from "./ErrorBanner";
 export { default as ConfirmDialog } from "./ConfirmDialog";
+export { VisuallyHidden, getAriaErrorMessage, useFocusTrap } from "./a11y";

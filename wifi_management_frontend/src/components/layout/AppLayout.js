@@ -21,10 +21,7 @@ function AppLayout() {
   /** Persistent app shell with sidebar, header, and main outlet for nested routes. */
   const location = useLocation();
 
-  const headerTitle = useMemo(
-    () => getHeaderTitle(location.pathname),
-    [location.pathname]
-  );
+  const headerTitle = useMemo(() => getHeaderTitle(location.pathname), [location.pathname]);
 
   const crumb = useMemo(() => {
     // Simple crumb for now, showing current path; can be replaced by breadcrumb component later.
@@ -33,24 +30,30 @@ function AppLayout() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
+
       <aside className="app-sidebar" aria-label="Primary navigation">
         <SidebarNav />
       </aside>
 
       <section className="app-main">
-        <header className="app-header">
-          <div className="header-left">
+        <header className="app-header" role="banner" aria-label="Page header">
+          <div className="header-left" aria-label="Page location">
             <div className="crumb" aria-label="Current route">
               {crumb}
             </div>
-            <div className="title">{headerTitle}</div>
+            <div className="title" id="page-title">
+              {headerTitle}
+            </div>
           </div>
           <div className="header-right">
             <HeaderStatus />
           </div>
         </header>
 
-        <main className="app-content" role="main">
+        <main className="app-content" id="main-content" role="main" aria-labelledby="page-title" tabIndex={-1}>
           <Outlet />
         </main>
       </section>

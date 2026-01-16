@@ -339,7 +339,7 @@ function SettingsPage() {
           </div>
 
           {saveState.savedAt ? (
-            <div style={{ marginTop: 10, fontSize: 12, color: "var(--muted)" }}>
+            <div style={{ marginTop: 10, fontSize: 12, color: "var(--muted)" }} aria-live="polite">
               Saved locally at {new Date(saveState.savedAt).toLocaleString()}.
             </div>
           ) : null}

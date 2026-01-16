@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { networksService } from "../../api";
 import {
@@ -13,11 +13,13 @@ import {
   SortableTh,
   Table,
   TableWrap,
+  VisuallyHidden,
+  getAriaErrorMessage,
 } from "../../components/ui";
 
 function normalizeApiErrorMessage(err) {
-  const msg = err?.api?.message || err?.message;
-  return String(msg || "Unexpected error");
+  // Backward-compatible local alias; prefer shared helper for consistency.
+  return getAriaErrorMessage(err, "Unexpected error");
 }
 
 function statusToBadge(status) {
@@ -61,6 +63,67 @@ function applySort(rows, sortState) {
 
   return next;
 }
+
+const NetworkRow = memo(function NetworkRow({ network, busy, onEdit, onToggleEnabled, onDelete }) {
+  const id = String(network?.id || "");
+  const badge = statusToBadge(network?.status);
+  const name = network?.name || id;
+
+  return (
+    <tr>
+      <td style={{ fontWeight: 900 }}>
+        <div style={{ display: "grid", gap: 2 }}>
+          <span>{name}</span>
+          <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>
+            {id}
+          </span>
+        </div>
+      </td>
+      <td style={{ color: "var(--muted)", fontWeight: 700 }}>{network?.band || "—"}</td>
+      <td style={{ color: "var(--muted)", fontWeight: 700 }}>{network?.security || "—"}</td>
+      <td>
+        <Badge variant={badge.variant}>{badge.label}</Badge>
+      </td>
+      <td>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <Link to={`/networks/${encodeURIComponent(id)}`} style={{ color: "var(--primary)", fontWeight: 900 }}>
+            View
+          </Link>
+
+          <Button
+            variant="ghost"
+            onClick={() => onEdit(network)}
+            disabled={busy.delete || busy.toggle}
+            aria-label={`Edit network ${name}`}
+          >
+            Edit
+          </Button>
+
+          <Button
+            variant="secondary"
+            loading={Boolean(busy.toggle)}
+            disabled={Boolean(busy.delete)}
+            onClick={() => onToggleEnabled(network)}
+            title="Optimistic update; rolls back on error"
+            aria-label={`${isEnabledStatus(network?.status) ? "Disable" : "Enable"} network ${name}`}
+          >
+            {isEnabledStatus(network?.status) ? "Disable" : "Enable"}
+          </Button>
+
+          <Button
+            variant="ghost"
+            loading={Boolean(busy.delete)}
+            disabled={Boolean(busy.toggle)}
+            onClick={() => onDelete(network)}
+            aria-label={`Delete network ${name}`}
+          >
+            Delete
+          </Button>
+        </div>
+      </td>
+    </tr>
+  );
+});
 
 // PUBLIC_INTERFACE
 function NetworksListPage() {
@@ -124,13 +187,7 @@ function NetworksListPage() {
     if (!q) return items;
 
     return items.filter((n) => {
-      const hay = [
-        n?.name,
-        n?.id,
-        n?.band,
-        n?.security,
-        n?.status,
-      ]
+      const hay = [n?.name, n?.id, n?.band, n?.security, n?.status]
         .map((v) => String(v || "").toLowerCase())
         .join(" ");
       return hay.includes(q);
@@ -154,19 +211,16 @@ function NetworksListPage() {
     setItems((prev) => prev.filter((n) => n?.id !== id));
   }, []);
 
-  const openConfirm = useCallback(
-    ({ title, description, confirmLabel, tone = "danger", onConfirm }) => {
-      setConfirmState({
-        open: true,
-        title,
-        description,
-        confirmLabel: confirmLabel || "Confirm",
-        tone,
-        onConfirm,
-      });
-    },
-    []
-  );
+  const openConfirm = useCallback(({ title, description, confirmLabel, tone = "danger", onConfirm }) => {
+    setConfirmState({
+      open: true,
+      title,
+      description,
+      confirmLabel: confirmLabel || "Confirm",
+      tone,
+      onConfirm,
+    });
+  }, []);
 
   const closeConfirm = useCallback(() => {
     setConfirmState((s) => ({ ...s, open: false, onConfirm: null }));
@@ -249,16 +303,14 @@ function NetworksListPage() {
   const showEmpty = useMemo(() => !loading && rows.length === 0, [loading, rows.length]);
 
   return (
-    <Card as="section">
+    <Card as="section" aria-label="Networks">
       <h1 className="page-title">Networks</h1>
       <p className="page-subtitle">
-        Manage SSIDs, security settings, and radio configuration. Data is loaded from the existing API service
-        (or deterministic mocks when <span className="mono">useMocks</span> is enabled).
+        Manage SSIDs, security settings, and radio configuration. Data is loaded from the existing API service (or
+        deterministic mocks when <span className="mono">useMocks</span> is enabled).
       </p>
 
-      {errorMessage ? (
-        <ErrorBanner title="Networks failed to load" message={errorMessage} onRetry={fetchList} />
-      ) : null}
+      {errorMessage ? <ErrorBanner title="Networks failed to load" message={errorMessage} onRetry={fetchList} /> : null}
 
       <div
         style={{
@@ -317,8 +369,11 @@ function NetworksListPage() {
             />
           </div>
         ) : (
-          <TableWrap aria-label="Networks table">
-            <Table>
+          <TableWrap>
+            <Table aria-label="Networks table">
+              <caption>
+                <VisuallyHidden>Networks list with status and actions</VisuallyHidden>
+              </caption>
               <thead>
                 <tr>
                   <SortableTh sortKey="name" sortState={sortState} onSort={onSort}>
@@ -342,57 +397,15 @@ function NetworksListPage() {
                 {rows.map((n) => {
                   const id = String(n?.id || "");
                   const busy = rowBusy[id] || {};
-                  const badge = statusToBadge(n?.status);
-
                   return (
-                    <tr key={id}>
-                      <td style={{ fontWeight: 900 }}>
-                        <div style={{ display: "grid", gap: 2 }}>
-                          <span>{n?.name || id}</span>
-                          <span className="mono" style={{ fontSize: 12, color: "var(--muted)" }}>
-                            {id}
-                          </span>
-                        </div>
-                      </td>
-                      <td style={{ color: "var(--muted)", fontWeight: 700 }}>{n?.band || "—"}</td>
-                      <td style={{ color: "var(--muted)", fontWeight: 700 }}>{n?.security || "—"}</td>
-                      <td>
-                        <Badge variant={badge.variant}>{badge.label}</Badge>
-                      </td>
-                      <td>
-                        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-                          <Link
-                            to={`/networks/${encodeURIComponent(id)}`}
-                            style={{ color: "var(--primary)", fontWeight: 900 }}
-                          >
-                            View
-                          </Link>
-
-                          <Button variant="ghost" onClick={() => onEdit(n)} disabled={busy.delete || busy.toggle}>
-                            Edit
-                          </Button>
-
-                          <Button
-                            variant="secondary"
-                            loading={Boolean(busy.toggle)}
-                            disabled={Boolean(busy.delete)}
-                            onClick={() => onToggleEnabled(n)}
-                            title="Optimistic update; rolls back on error"
-                          >
-                            {isEnabledStatus(n?.status) ? "Disable" : "Enable"}
-                          </Button>
-
-                          <Button
-                            variant="ghost"
-                            loading={Boolean(busy.delete)}
-                            disabled={Boolean(busy.toggle)}
-                            onClick={() => onDelete(n)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
+                    <NetworkRow
+                      key={id}
+                      network={n}
+                      busy={busy}
+                      onEdit={onEdit}
+                      onToggleEnabled={onToggleEnabled}
+                      onDelete={onDelete}
+                    />
                   );
                 })}
               </tbody>

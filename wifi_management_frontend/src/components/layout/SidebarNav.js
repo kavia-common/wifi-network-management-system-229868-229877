@@ -21,18 +21,23 @@ function SidebarNav() {
         </div>
       </div>
 
-      <nav className="nav">
+      <nav className="nav" aria-label="Primary">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) => (isActive ? "active" : undefined)}
             end={item.to === "/dashboard"}
+            aria-label={item.label}
           >
-            <span className="nav-icon" aria-hidden="true">
-              {item.icon}
-            </span>
-            <span>{item.label}</span>
+            {({ isActive }) => (
+              <>
+                <span className="nav-icon" aria-hidden="true">
+                  {item.icon}
+                </span>
+                <span aria-current={isActive ? "page" : undefined}>{item.label}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>

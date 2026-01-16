@@ -8,10 +8,10 @@ import React, { useMemo } from "react";
  */
 
 // PUBLIC_INTERFACE
-function TableWrap({ children, "aria-label": ariaLabel, className = "", ...rest }) {
+function TableWrap({ children, className = "", ...rest }) {
   /** Responsive wrapper enabling horizontal scroll on narrow viewports. */
   return (
-    <div className={["table-wrap", className].filter(Boolean).join(" ")} aria-label={ariaLabel} {...rest}>
+    <div className={["table-wrap", className].filter(Boolean).join(" ")} {...rest}>
       {children}
     </div>
   );
@@ -19,24 +19,16 @@ function TableWrap({ children, "aria-label": ariaLabel, className = "", ...rest 
 
 // PUBLIC_INTERFACE
 function Table({ children, className = "", ...rest }) {
-  /** Styled table element (min-width handled by CSS). */
+  /** Styled table element (min-width handled by CSS). Prefer aria-label or <caption> for accessibility. */
   return (
-    <table className={["table", className].filter(Boolean).join(" ")} role="table" {...rest}>
+    <table className={["table", className].filter(Boolean).join(" ")} {...rest}>
       {children}
     </table>
   );
 }
 
 // PUBLIC_INTERFACE
-function SortableTh({
-  children,
-  sortKey,
-  sortState,
-  onSort,
-  align = "left",
-  style,
-  ...rest
-}) {
+function SortableTh({ children, sortKey, sortState, onSort, align = "left", style, ...rest }) {
   /**
    * Table header cell that can trigger sort changes.
    * This is a "hook placeholder": it doesn't implement sorting logic itself.
@@ -50,11 +42,20 @@ function SortableTh({
 
   const indicator = useMemo(() => {
     if (!isSortable) return null;
-    if (!sortState || sortState.key !== sortKey) return <span className="sort-indicator" aria-hidden="true">↕</span>;
+    if (!sortState || sortState.key !== sortKey)
+      return (
+        <span className="sort-indicator" aria-hidden="true">
+          ↕
+        </span>
+      );
     return sortState.direction === "desc" ? (
-      <span className="sort-indicator" aria-hidden="true">↓</span>
+      <span className="sort-indicator" aria-hidden="true">
+        ↓
+      </span>
     ) : (
-      <span className="sort-indicator" aria-hidden="true">↑</span>
+      <span className="sort-indicator" aria-hidden="true">
+        ↑
+      </span>
     );
   }, [isSortable, sortKey, sortState]);
 
@@ -74,11 +75,7 @@ function SortableTh({
       className="th-sortable"
       {...rest}
     >
-      <button
-        type="button"
-        className="th-sort-button"
-        onClick={() => onSort(sortKey)}
-      >
+      <button type="button" className="th-sort-button" onClick={() => onSort(sortKey)}>
         <span>{children}</span>
         {indicator}
       </button>

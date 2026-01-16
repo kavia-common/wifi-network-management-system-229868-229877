@@ -1,11 +1,10 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { clientsService, networksService } from "../../api";
-import { Badge, Button, Card, EmptyState, ErrorBanner, LoadingSkeleton } from "../../components/ui";
+import { Badge, Button, Card, EmptyState, ErrorBanner, LoadingSkeleton, getAriaErrorMessage } from "../../components/ui";
 
 function normalizeApiErrorMessage(err) {
-  const msg = err?.api?.message || err?.message;
-  return String(msg || "Unexpected error");
+  return getAriaErrorMessage(err, "Unexpected error");
 }
 
 function safeNumber(v, fallback = null) {
@@ -252,6 +251,7 @@ function ClientDetailPage() {
                   loading={busy.block}
                   onClick={onToggleBlock}
                   title="Optimistic update; rolls back on error"
+                  aria-label={`${client?.blocked ? "Allow" : "Block"} client ${client?.name || client?.id || clientId}`}
                 >
                   {client?.blocked ? "Allow" : "Block"}
                 </Button>

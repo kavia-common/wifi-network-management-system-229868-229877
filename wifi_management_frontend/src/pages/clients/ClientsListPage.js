@@ -12,11 +12,12 @@ import {
   SortableTh,
   Table,
   TableWrap,
+  VisuallyHidden,
+  getAriaErrorMessage,
 } from "../../components/ui";
 
 function normalizeApiErrorMessage(err) {
-  const msg = err?.api?.message || err?.message;
-  return String(msg || "Unexpected error");
+  return getAriaErrorMessage(err, "Unexpected error");
 }
 
 function toComparable(v) {
@@ -381,8 +382,11 @@ function ClientsListPage() {
             />
           </div>
         ) : (
-          <TableWrap aria-label="Clients table">
-            <Table>
+          <TableWrap>
+            <Table aria-label="Clients table">
+              <caption>
+                <VisuallyHidden>Clients list with device info, signal strength, and actions</VisuallyHidden>
+              </caption>
               <thead>
                 <tr>
                   <SortableTh sortKey="name" sortState={sortState} onSort={onSort}>
@@ -461,6 +465,7 @@ function ClientsListPage() {
                             loading={Boolean(busy.block)}
                             onClick={() => onToggleBlock(c)}
                             title="Optimistic update; rolls back on error"
+                            aria-label={`${c?.blocked ? "Allow" : "Block"} client ${c?.name || id}`}
                           >
                             {c?.blocked ? "Allow" : "Block"}
                           </Button>

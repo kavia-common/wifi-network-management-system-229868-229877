@@ -12,11 +12,12 @@ import {
   LoadingSkeleton,
   Table,
   TableWrap,
+  VisuallyHidden,
+  getAriaErrorMessage,
 } from "../../components/ui";
 
 function normalizeApiErrorMessage(err) {
-  const msg = err?.api?.message || err?.message;
-  return String(msg || "Unexpected error");
+  return getAriaErrorMessage(err, "Unexpected error");
 }
 
 function isEnabledStatus(status) {
@@ -429,8 +430,11 @@ function NetworkDetailPage() {
             />
           </div>
         ) : (
-          <TableWrap aria-label="Connected clients table">
-            <Table>
+          <TableWrap>
+            <Table aria-label="Connected clients table">
+              <caption>
+                <VisuallyHidden>Clients connected to this network</VisuallyHidden>
+              </caption>
               <thead>
                 <tr>
                   <th scope="col">Name</th>
