@@ -29,12 +29,20 @@ Base URL for the backend REST API.
 
 A feature-flag payload to enable/disable UI capabilities without code changes.
 
-**Expected format (planned):**
-- JSON string (recommended), e.g. `{"newDashboard":true,"advancedWifiControls":false}`
-- or a comma-separated list, e.g. `newDashboard,advancedWifiControls` (if we choose to support it later)
+**Supported formats:**
+- Querystring-like: `useMocks=true,foo=bar` or `useMocks=true&foo=bar`
+- JSON: `{"useMocks":true,"foo":"bar"}`
+- Simple list: `useMocks,newDashboard` (listed flags are treated as `true`)
 
-**Usage (planned):**
-- The frontend will parse `process.env.REACT_APP_FEATURE_FLAGS` on startup and conditionally render routes/features.
+**Built-in flags:**
+- `useMocks` (boolean): when enabled, `src/api/index.js` will transparently swap real API services for deterministic mock services (with simulated latency). Call sites do not change.
+
+**Usage examples:**
+- Enable mocks (recommended during UI work without backend):
+  - macOS/Linux: `REACT_APP_FEATURE_FLAGS="useMocks=true" npm start`
+  - Windows PowerShell: `$env:REACT_APP_FEATURE_FLAGS="useMocks=true"; npm start`
+- Enable mocks + another flag:
+  - `REACT_APP_FEATURE_FLAGS="useMocks=true,newDashboard" npm start`
 
 ## Getting Started
 
