@@ -1,27 +1,60 @@
-/* Ocean Professional theme tokens (app-level) */
+/* Ocean Professional theme tokens + global component styles.
+   Keep classnames consistent with Step 2.2 layout components (AppLayout/SidebarNav/HeaderStatus). */
+
 :root {
+  /* Core palette */
+  --primary: #2563eb;
+  --secondary: #f59e0b;
+  --success: #f59e0b; /* per style guide */
+  --error: #ef4444;
+
+  /* Surfaces */
   --bg: #f9fafb;
   --surface: #ffffff;
+
+  /* Typography */
   --text: #111827;
   --muted: #6b7280;
 
-  --border: rgba(17, 24, 39, 0.08);
+  /* Decorative */
+  --gradient-soft: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.1) 0%,
+    #f9fafb 60%
+  );
+
+  --border: rgba(17, 24, 39, 0.09);
+  --border-strong: rgba(17, 24, 39, 0.14);
+
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06);
   --shadow: 0 10px 25px rgba(17, 24, 39, 0.08);
+  --shadow-lg: 0 18px 45px rgba(17, 24, 39, 0.12);
 
-  /* Accents */
-  --primary: #2563eb;
-  --secondary: #f59e0b;
-  --error: #ef4444;
-  --success: #10b981;
-
+  --radius-sm: 10px;
   --radius: 14px;
 
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.18);
+
+  /* Layout */
   --sidebar-width: 260px;
   --header-height: 64px;
+
+  /* Spacing */
+  --space-1: 6px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 24px;
 }
 
 * {
   box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
 }
 
 body {
@@ -32,13 +65,37 @@ body {
   color: var(--text);
 }
 
-/* App shell layout */
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.18);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 10px;
+}
+
+/* =========================
+   App shell layout (Step 2.2)
+   ========================= */
+
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   min-height: 100vh;
+  background: var(--gradient-soft);
 }
 
+/* Sidebar */
 .app-sidebar {
   position: sticky;
   top: 0;
@@ -48,27 +105,34 @@ body {
   padding: 18px 14px;
 }
 
+/* Main */
 .app-main {
   min-width: 0;
   display: grid;
   grid-template-rows: var(--header-height) 1fr;
 }
 
+/* Header */
 .app-header {
   height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
 
+/* Content container */
 .app-content {
   padding: 20px;
   min-width: 0;
 }
+
+/* =========================
+   Cards / Typography
+   ========================= */
 
 .card {
   background: var(--surface);
@@ -78,10 +142,14 @@ body {
   padding: 16px;
 }
 
+.card.card-flat {
+  box-shadow: none;
+}
+
 .page-title {
   margin: 0 0 8px 0;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.02em;
 }
 
@@ -89,10 +157,28 @@ body {
   margin: 0 0 16px 0;
   color: var(--muted);
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
-/* Sidebar nav */
+/* Small helpers for consistent layouts */
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+}
+
+.grid.auto-fit-cards {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* =========================
+   Sidebar nav (Step 2.2)
+   ========================= */
+
 .brand {
   display: flex;
   align-items: center;
@@ -105,13 +191,14 @@ body {
   height: 34px;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--primary), #60a5fa);
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.22);
 }
 
 .brand-title {
   display: flex;
   flex-direction: column;
   line-height: 1.1;
+  min-width: 0;
 }
 
 .brand-title strong {
@@ -139,13 +226,18 @@ body {
   align-items: center;
   gap: 10px;
   border: 1px solid transparent;
-  transition: background 120ms ease, border-color 120ms ease,
-    transform 120ms ease;
+  transition: background 140ms ease, border-color 140ms ease,
+    transform 140ms ease;
 }
 
 .nav a:hover {
   background: rgba(37, 99, 235, 0.06);
   border-color: rgba(37, 99, 235, 0.12);
+  text-decoration: none;
+}
+
+.nav a:active {
+  transform: translateY(1px);
 }
 
 .nav a.active {
@@ -160,7 +252,7 @@ body {
   background: rgba(17, 24, 39, 0.05);
   display: grid;
   place-items: center;
-  font-weight: 700;
+  font-weight: 800;
   color: rgba(17, 24, 39, 0.7);
 }
 
@@ -169,7 +261,10 @@ body {
   color: var(--primary);
 }
 
-/* Header status */
+/* =========================
+   Header status (Step 2.2)
+   ========================= */
+
 .header-left {
   display: flex;
   flex-direction: column;
@@ -187,7 +282,7 @@ body {
 
 .header-left .title {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.01em;
 }
 
@@ -204,8 +299,8 @@ body {
   padding: 8px 10px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: #ffffff;
-  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-sm);
   font-size: 12px;
   color: rgba(17, 24, 39, 0.85);
 }
@@ -229,7 +324,162 @@ body {
   background: var(--error);
 }
 
-/* Responsive */
+/* =========================
+   Buttons / Badges / Forms
+   (Used by future pages; safe global utilities)
+   ========================= */
+
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease,
+    border-color 140ms ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+  border-color: var(--border-strong);
+  background: rgba(17, 24, 39, 0.02);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  border-color: rgba(37, 99, 235, 0.25);
+  background: linear-gradient(135deg, var(--primary), #3b82f6);
+  color: #ffffff;
+  box-shadow: 0 14px 34px rgba(37, 99, 235, 0.22);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+}
+
+.btn-secondary {
+  border-color: rgba(245, 158, 11, 0.25);
+  background: linear-gradient(135deg, var(--secondary), #fbbf24);
+  color: #111827;
+  box-shadow: 0 14px 34px rgba(245, 158, 11, 0.18);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(17, 24, 39, 0.02);
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(17, 24, 39, 0.86);
+}
+
+.badge-success {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.22);
+}
+
+.badge-error {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.18);
+}
+
+/* Forms */
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(17, 24, 39, 0.78);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: var(--shadow-sm), var(--focus-ring);
+}
+
+.help-text {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* =========================
+   Tables (Responsive)
+   ========================= */
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius);
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 560px;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 800;
+  background: rgba(17, 24, 39, 0.02);
+}
+
+.table tr:hover td {
+  background: rgba(37, 99, 235, 0.03);
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+/* =========================
+   Responsive behavior
+   - Sidebar collapses to top panel on small screens
+   - Tables scroll horizontally
+   ========================= */
+
 @media (max-width: 980px) {
   :root {
     --sidebar-width: 220px;
@@ -248,7 +498,22 @@ body {
     border-bottom: 1px solid var(--border);
   }
 
-  .app-main {
-    grid-template-rows: var(--header-height) 1fr;
+  .app-header {
+    padding: 0 14px;
+  }
+
+  .app-content {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 520px) {
+  .status-pill {
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+
+  .page-title {
+    font-size: 18px;
   }
 }

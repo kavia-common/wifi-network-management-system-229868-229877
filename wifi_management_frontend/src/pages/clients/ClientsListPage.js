@@ -17,49 +17,40 @@ function ClientsListPage() {
         soon).
       </p>
 
-      <div className="card" style={{ boxShadow: "none", padding: 0 }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 180px 160px 120px",
-            gap: 10,
-            padding: 12,
-            borderBottom: "1px solid var(--border)",
-            fontSize: 12,
-            color: "var(--muted)",
-            fontWeight: 600,
-          }}
-        >
-          <div>Name</div>
-          <div>MAC</div>
-          <div>IP</div>
-          <div>Action</div>
+      <div className="card card-flat" style={{ padding: 0 }}>
+        <div className="table-wrap" aria-label="Clients table">
+          <table className="table" role="table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">MAC</th>
+                <th scope="col">IP</th>
+                <th scope="col" style={{ width: 120 }}>
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {stubClients.map((c) => (
+                <tr key={c.id}>
+                  <td style={{ fontWeight: 800 }}>{c.name}</td>
+                  <td className="mono" style={{ color: "var(--muted)" }}>
+                    {c.id}
+                  </td>
+                  <td style={{ color: "var(--muted)" }}>{c.ip}</td>
+                  <td>
+                    <Link
+                      to={`/clients/${encodeURIComponent(c.id)}`}
+                      style={{ color: "var(--primary)", fontWeight: 800 }}
+                    >
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-
-        {stubClients.map((c) => (
-          <div
-            key={c.id}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 180px 160px 120px",
-              gap: 10,
-              padding: 12,
-              borderBottom: "1px solid var(--border)",
-              alignItems: "center",
-            }}
-          >
-            <div style={{ fontWeight: 700 }}>{c.name}</div>
-            <div style={{ color: "var(--muted)", fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace" }}>
-              {c.id}
-            </div>
-            <div style={{ color: "var(--muted)" }}>{c.ip}</div>
-            <div>
-              <Link to={`/clients/${encodeURIComponent(c.id)}`} style={{ color: "var(--primary)", fontWeight: 700 }}>
-                View
-              </Link>
-            </div>
-          </div>
-        ))}
       </div>
     </section>
   );
