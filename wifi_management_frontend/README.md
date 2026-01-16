@@ -9,6 +9,33 @@ This project provides a minimal React template with a clean, modern UI and minim
 - **Fast**: Minimal dependencies for quick loading times
 - **Simple**: Easy to understand and modify
 
+## Runtime configuration (Environment Variables)
+
+This app follows Create React App conventions: any env var prefixed with `REACT_APP_` is embedded at build time and can be read at runtime via `process.env`.
+
+### `REACT_APP_API_BASE`
+
+Base URL for the backend REST API.
+
+**Usage (planned):**
+- The frontend will build API requests by prefixing endpoints with `process.env.REACT_APP_API_BASE`.
+- Example: `fetch(\`\${process.env.REACT_APP_API_BASE}/networks\`)`
+
+**Notes:**
+- If unset, the app should fall back to a sensible default during development (to be implemented when API client is added).
+- Do not hardcode production URLs in source code; provide the correct value via `.env` / deployment configuration.
+
+### `REACT_APP_FEATURE_FLAGS`
+
+A feature-flag payload to enable/disable UI capabilities without code changes.
+
+**Expected format (planned):**
+- JSON string (recommended), e.g. `{"newDashboard":true,"advancedWifiControls":false}`
+- or a comma-separated list, e.g. `newDashboard,advancedWifiControls` (if we choose to support it later)
+
+**Usage (planned):**
+- The frontend will parse `process.env.REACT_APP_FEATURE_FLAGS` on startup and conditionally render routes/features.
+
 ## Getting Started
 
 In the project directory, you can run:
